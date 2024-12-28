@@ -23,6 +23,7 @@ func NewServer(config Config) *Server {
 	}
 
 	server.mux.HandleFunc("GET /api/notes", server.GetAllNotes)
+	server.mux.HandleFunc("GET /api/notes/{path...}", server.GetNoteByFilePath)
 
 	return &server
 }

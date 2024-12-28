@@ -1,4 +1,5 @@
 export interface Note {
-  timestamp: number
+  id: string
+  path: string
   text: string
 }

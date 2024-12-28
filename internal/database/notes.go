@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -23,6 +24,18 @@ func (nr *NoteRepository) FetchAll() ([]types.Note, error) {
 	return importAllMarkdownFiles(nr.markdownDirectory)
 }
 
+func (nr *NoteRepository) FetchOne(filePath string) (types.Note, error) {
+	data, err := os.ReadFile(filepath.Join(nr.markdownDirectory, filePath))
+	if err != nil {
+		return types.Note{}, err
+	}
+
+	return types.Note{
+		Path: filePath,
+		Text: string(data),
+	}, nil
+}
+
 func importAllMarkdownFiles(rootDirectory string) ([]types.Note, error) {
 	notes := make([]types.Note, 0)
 
@@ -41,7 +54,7 @@ func importAllMarkdownFiles(rootDirectory string) ([]types.Note, error) {
 		}
 
 		notes = append(notes, types.Note{
-			Path: filePath,
+			Path: strings.TrimPrefix(filePath, fmt.Sprintf("%s/", rootDirectory)),
 			Text: string(data),
 		})
 

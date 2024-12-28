@@ -8,10 +8,14 @@ const noteRepository = new NoteRepository()
 const notes: Ref<Array<Note>> = ref([])
 
 onMounted(async () => {
-  notes.value = await noteRepository.getAllNotes()
+  notes.value = await noteRepository.getAll()
 })
 </script>
 
 <template>
-  <main>{{ notes }}</main>
+  <main>
+    <div v-for="note in notes" :key="note.id">
+      <a :href="`/note/${note.path}`">{{ note.path }}</a>
+    </div>
+  </main>
 </template>
