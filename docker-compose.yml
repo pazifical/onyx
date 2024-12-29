@@ -1,6 +1,6 @@
 services:
   onyx:
-    image: onyx:0.0.1
+    image: onyx:0.0.2
     ports:
       - "8014:8080"
     restart: unless-stopped

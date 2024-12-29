@@ -18,9 +18,11 @@ RUN npm run build
 
 # Building Go backend
 
-FROM golang:1.23-alpine  AS gobuild
+FROM golang:1.23-alpine AS gobuild
 
 WORKDIR /app
+
+COPY --from=nodebuild /app/dist frontend/dist
 
 COPY go.mod .
 COPY main.go .
@@ -35,7 +37,6 @@ FROM alpine:3.21
 
 WORKDIR /app
 
-COPY --from=nodebuild /app/dist dist
 COPY --from=gobuild /app/onyx .
 
 CMD [ "/app/onyx" ]
