@@ -50,6 +50,8 @@ async function updateFromRoutePath(path: Array<string> | string) {
     currentDirectory.value = '/'
   }
 
+  console.log('currentDirectory', currentDirectory.value)
+
   directoryContent.value = await directoryContentRepository.getByPath(currentDirectory.value)
 }
 
