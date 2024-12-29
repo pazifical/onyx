@@ -4,5 +4,7 @@ services:
     ports:
       - "8014:8080"
     restart: unless-stopped
+    environment:
+      - ONYX_MARKDOWN_DIRECTORY=testdata
     volumes:
       - ./testdata:/app/testdata

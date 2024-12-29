@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import NavigationSidebar from '@/components/NavigationSidebar.vue'
+import NoteViewer from '@/components/NoteViewer.vue'
 import { DirectoryContentRepository } from '@/repository/directory'
 import type { DirectoryContent } from '@/types'
-import { onMounted, ref, watch, type Ref } from 'vue'
+import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -12,10 +14,31 @@ const directoryContentRepository = new DirectoryContentRepository()
 
 const directoryContent: Ref<DirectoryContent | null> = ref(null)
 
+const selectedFilePath: Ref<string> = ref('')
+
+const isSidebarVisible: Ref<boolean> = ref(true)
+const selectedGridLayout: Ref<string> = ref('20ch 1fr')
+
+const parentDirectories: ComputedRef<Array<Array<string>>> = computed(() => {
+  const directories: Array<Array<string>> = []
+
+  const parts = currentDirectory.value.split('/').filter((d) => d !== '')
+  console.log(parts)
+
+  let path: string = ''
+  parts.forEach((p) => {
+    path += `/${p}`
+    directories.push([p, `${path}`])
+  })
+
+  return directories
+})
+
 watch(
   () => route.params.path,
   async (newPath, oldPath) => {
     console.log(oldPath, '->', newPath)
+    selectedFilePath.value = ''
     updateFromRoutePath(newPath)
   },
 )
@@ -34,42 +57,99 @@ onMounted(async () => {
   updateFromRoutePath(route.params.path)
   return
 })
+
+function hideSidebar() {
+  isSidebarVisible.value = false
+  selectedGridLayout.value = '1rem 1fr'
+}
+
+function showSidebar() {
+  isSidebarVisible.value = true
+  selectedGridLayout.value = '20ch 1fr'
+}
 </script>
 
 <template>
   <main v-if="directoryContent">
-    <section>
-      <nav>
-        {{ currentDirectory }}
+    <section class="header">
+      <nav v-if="parentDirectories.length > 0">
+        <RouterLink :to="`${pd[1]}`" v-for="pd in parentDirectories" :key="pd[1]">
+          {{ '/' + pd[0] }}
+        </RouterLink>
+      </nav>
+      <nav v-else>
+        <RouterLink to="/">/</RouterLink>
       </nav>
     </section>
 
-    <section v-if="directoryContent.directories.length > 0">
-      <h2>Directories</h2>
-      <div v-for="directory in directoryContent.directories" :key="directory">
-        <RouterLink :to="`${currentDirectory}${directory}`">{{ directory }}</RouterLink>
-      </div>
-    </section>
+    <div class="content" :style="{ 'grid-template-columns': selectedGridLayout }">
+      <div id="sidebar">
+        <header>
+          <button v-if="isSidebarVisible" @click="hideSidebar()">-</button>
+          <button v-else @click="showSidebar()">+</button>
+        </header>
 
-    <section v-if="directoryContent.files.length > 0">
-      <h2>Files</h2>
-      <div v-for="filename in directoryContent.files" :key="filename">
-        <RouterLink :to="`/note${currentDirectory}${filename}`">{{ filename }}</RouterLink>
+        <NavigationSidebar
+          class="sidebar-content"
+          :directory-content="directoryContent"
+          :current-directory="currentDirectory"
+          @file-select="(path) => (selectedFilePath = path)"
+        />
       </div>
-    </section>
+
+      <div id="note-viewer" v-if="selectedFilePath">
+        <NoteViewer :path="selectedFilePath" />
+      </div>
+      <div v-else style="display: flex; justify-content: center; align-items: center">
+        <strong style="font-size: 2rem"> Please select a file on the left </strong>
+      </div>
+    </div>
   </main>
 </template>
 
 <style scoped>
+header {
+  height: 2rem;
+  display: flex;
+  justify-content: right;
+}
+
+header > button {
+  padding: none;
+  border: 1px solid var(--color-highlight);
+  border-radius: 0;
+  margin: 0;
+  line-height: 0;
+}
+
 nav {
   font-size: 1rem;
 }
 
-section {
-  margin-bottom: 2rem;
+.content {
+  display: grid;
+  grid-template-columns: 20ch 1fr;
+  grid-template-rows: 1fr;
+}
+
+#sidebar {
+  border-right: 2px solid var(--color-light);
+}
+
+#sidebar-content {
+  padding: 0 1rem 0 0;
+}
+
+#note-viewer {
+  padding: 0 0 0 1rem;
 }
 
 h2 {
   color: var(--color-text);
+}
+
+.header {
+  border-bottom: 2px solid var(--color-light);
+  padding-bottom: 1rem;
 }
 </style>

@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"os"
+	"strings"
 )
 
 type DirectoryContent struct {
@@ -23,7 +24,7 @@ func NewDirectoryContent(directory string) (DirectoryContent, error) {
 	for _, entry := range entries {
 		if entry.IsDir() {
 			directoryContent.Directories = append(directoryContent.Directories, entry.Name())
-		} else {
+		} else if strings.HasSuffix(entry.Name(), ".md") {
 			directoryContent.Files = append(directoryContent.Files, entry.Name())
 		}
 	}
