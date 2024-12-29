@@ -1,5 +1,9 @@
 export interface Note {
-  id: string
   path: string
   text: string
+}
+
+export interface DirectoryContent {
+  files: Array<string>
+  directories: Array<string>
 }

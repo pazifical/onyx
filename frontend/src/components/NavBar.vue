@@ -6,8 +6,16 @@ import { RouterLink } from 'vue-router'
   <header>
     <div class="wrapper">
       <nav>
-        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/"><h1>ONYX</h1></RouterLink>
       </nav>
     </div>
   </header>
 </template>
+
+<style scoped>
+h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0px;
+}
+</style>
