@@ -29,6 +29,9 @@ onMounted(async () => {
 
 async function fetchData() {
   isEditMode.value = false
+  if (typeof route.params.path == 'string') {
+    return
+  }
   const filePath = route.params.path.join('/')
   note.value = await noteRepository.getByPath(filePath)
   updateMarkdown()
@@ -39,16 +42,21 @@ function toggleEditMode() {
 }
 
 function updateMarkdown() {
+  if (!note.value) {
+    return
+  }
   noteTextMd.value = converter.makeHtml(note.value?.text.replace('<BASEURL>', baseURL))
 }
 
-async function saveNote() {}
+async function saveNote() {
+  // TODO
+}
 </script>
 
 <template>
   <main v-if="note">
     <header>
-      <h2 class="title">Displaying {{ note?.path }}</h2>
+      <h2 class="title">/{{ note?.path }}</h2>
       <template v-if="isEditMode">
         <div class="button-row">
           <button @click="saveNote()">Save</button>
