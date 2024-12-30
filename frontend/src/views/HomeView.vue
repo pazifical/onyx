@@ -86,37 +86,51 @@ function showSidebar() {
 
     <div class="content" :style="{ 'grid-template-columns': selectedGridLayout }">
       <div id="sidebar">
-        <header>
-          <button v-if="isSidebarVisible" @click="hideSidebar()">-</button>
-          <button v-else @click="showSidebar()">+</button>
-        </header>
+        <div id="nav-area">
+          <NavigationSidebar  class="sidebar-content" :directory-content="directoryContent"
+            :current-directory="currentDirectory" @file-select="(path) => (selectedFilePath = path)" />
 
-        <NavigationSidebar
-          class="sidebar-content"
-          :directory-content="directoryContent"
-          :current-directory="currentDirectory"
-          @file-select="(path) => (selectedFilePath = path)"
-        />
+            <template v-if="isSidebarVisible">
+              <div class="shrinker" @click="hideSidebar()">-</div>
+            </template>
+            <template v-else>
+              <div class="shrinker" @click="showSidebar()">+</div>
+            </template>
+
+        </div>
       </div>
 
       <div id="note-viewer" v-if="selectedFilePath">
         <NoteViewer :path="selectedFilePath" />
       </div>
       <div v-else style="display: flex; justify-content: center; align-items: center">
-        <strong style="font-size: 2rem"> Please select a file on the left </strong>
+        <strong style="font-size: 1.5rem"> Please select a file on the left </strong>
       </div>
     </div>
   </main>
 </template>
 
 <style scoped>
+
+.shrinker {
+  background-color: var(--color-highlight);
+  font-weight: bold;
+  color: var(--color-dark);
+  text-align: center;
+}
+
+#nav-area {
+  display: grid;
+  grid-template-columns: 1fr 1rem;
+}
+
 header {
   height: 2rem;
   display: flex;
   justify-content: right;
 }
 
-header > button {
+header>button {
   padding: none;
   border: 1px solid var(--color-highlight);
   border-radius: 0;
@@ -153,5 +167,9 @@ h2 {
 .header {
   border-bottom: 2px solid var(--color-light);
   padding-bottom: 1rem;
+}
+
+main {
+  padding: 1rem 0;
 }
 </style>

@@ -65,19 +65,22 @@ async function saveNote() {
 
 <template>
   <main v-if="note">
+
     <header>
-      <template v-if="isEditMode">
-        <div class="button-row">
-          <button @click="saveNote()">Save</button>
-          <button @click="fetchData()">Cancel</button>
-        </div>
-      </template>
-      <template v-else>
-        <button @click="toggleEditMode()">Edit</button>
-      </template>
+      <h2 class="title" style="margin-left: 0; margin-right: auto;">/{{ note?.path }}</h2>
+      <div>
+        <template v-if="isEditMode">
+          <div class="button-row">
+            <button @click="saveNote()">Save</button>
+            <button @click="fetchData()">Cancel</button>
+          </div>
+        </template>
+        <template v-else>
+          <button @click="toggleEditMode()">Edit</button>
+        </template>
+      </div>
     </header>
 
-    <h2 class="title">/{{ note?.path }}</h2>
     <div class="markdown">
       <template v-if="isEditMode">
         <textarea v-model="note.text"></textarea>
@@ -111,5 +114,9 @@ textarea {
 .title {
   color: var(--color-light);
   font-weight: bold;
+}
+
+main {
+  padding: 1rem 0;
 }
 </style>

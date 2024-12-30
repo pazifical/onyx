@@ -6,7 +6,9 @@ import { RouterLink } from 'vue-router'
   <header>
     <div class="wrapper">
       <nav>
-        <RouterLink to="/"><h1>Onyx</h1></RouterLink>
+        <RouterLink to="/">
+          <h1>O<strong style="font-size: 2rem;">NYX</strong></h1>
+        </RouterLink>
       </nav>
     </div>
   </header>

@@ -16,6 +16,8 @@ var markdownDirectory = "testdata"
 //go:embed frontend/dist
 var frontendFS embed.FS
 
+var isDevMode bool
+
 func init() {
 	envMarkdownDirectory := os.Getenv("ONYX_MARKDOWN_DIRECTORY")
 	if envMarkdownDirectory != "" {
@@ -40,7 +42,7 @@ func init() {
 
 func main() {
 	config := onyx.Config{
-		Port:              8080,
+		Port:              80,
 		MarkdownDirectory: markdownDirectory,
 	}
 
