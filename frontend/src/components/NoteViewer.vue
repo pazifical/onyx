@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { NoteRepository } from '@/repository/note'
 import type { Note } from '@/types'
-import {  onMounted, ref, watch, type Ref } from 'vue'
+import { onMounted, ref, watch, type Ref } from 'vue'
 import * as showdown from 'showdown'
 import PencilFillIcon from './icons/PencilFillIcon.vue';
 import FloppyFillIcon from './icons/FloppyFillIcon.vue';
 import SquareXIcon from './icons/SquareXIcon.vue';
 import { useRoute } from 'vue-router';
+
+// const props = defineProps<{ path?: string }>()
 
 const converter = new showdown.Converter({
   tasklists: true,
@@ -24,6 +26,9 @@ const route = useRoute()
 
 const fileName: Ref<string> = ref("")
 
+// watch(() => props.path, async (oldPath, newPath) => {
+//   console.log("from", oldPath, "to", newPath)
+// })
 
 watch(
   () => route.query.file,
@@ -44,7 +49,9 @@ watch(
 )
 
 onMounted(async () => {
-  await fetchData(`${route.path}/${route.query.file}`)
+  const url = `${route.path}/${route.query.file}`;
+  console.log("fetching from", url)
+  await fetchData(url)
 })
 
 async function fetchData(filepath?: string) {
@@ -53,7 +60,7 @@ async function fetchData(filepath?: string) {
   }
 
   const parts = filepath.split("/")
-  fileName.value = parts[parts.length-1]
+  fileName.value = parts[parts.length - 1]
 
   isEditMode.value = false
   note.value = await noteRepository.getByPath(filepath)

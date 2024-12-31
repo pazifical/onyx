@@ -49,6 +49,24 @@ watch(
 )
 
 
+// watch(
+//   () => route.query.file,
+//   async (newFilename, oldFilename) => {
+//     if (newFilename === oldFilename) {
+//       return
+//     }
+
+//     console.log('note', oldFilename, '->', newFilename)
+
+//     if (newFilename) {
+//       selectedFilePath.value = `${route.path}/${newFilename}`
+//     } else {
+//       selectedFilePath.value = null
+//     }
+
+//   },
+// )
+
 
 async function updateFromRoutePath(path: Array<string> | string) {
   if (path && typeof path != 'string') {
@@ -115,7 +133,7 @@ function showSidebar() {
       </div>
 
       <div id="note-viewer" v-if="selectedFilePath">
-        <NoteViewer />
+        <NoteViewer/>
       </div>
       <div v-else style="display: flex; justify-content: center;; padding: 1rem">
         <strong style="font-size: 1.5rem; color: rgb(255 255 255 / 0.5)">Please select a file on the left </strong>
