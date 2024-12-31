@@ -103,8 +103,8 @@ function showSidebar() {
       <div id="note-viewer" v-if="selectedFilePath">
         <NoteViewer :path="selectedFilePath" />
       </div>
-      <div v-else style="display: flex; justify-content: center; align-items: center">
-        <strong style="font-size: 1.5rem"> Please select a file on the left </strong>
+      <div v-else style="display: flex; justify-content: center;; padding: 1rem">
+        <strong style="font-size: 1.5rem; color: rgb(255 255 255 / 0.5)">Please select a file on the left </strong>
       </div>
     </div>
   </main>
@@ -117,6 +117,12 @@ function showSidebar() {
   font-weight: bold;
   color: var(--color-dark);
   text-align: center;
+}
+
+.shrinker:hover {
+  background-color: var(--color-dark);
+  color: var(--color-highlight);
+  border: 1px solid var(--color-highlight);
 }
 
 #nav-area {
@@ -145,11 +151,11 @@ nav {
 .content {
   display: grid;
   grid-template-columns: 20ch 1fr;
-  grid-template-rows: 1fr;
 }
 
 #sidebar {
   border-right: 2px solid var(--color-light);
+  display: grid;
 }
 
 #sidebar-content {
@@ -157,7 +163,7 @@ nav {
 }
 
 #note-viewer {
-  padding: 0 0 0 1rem;
+  /* padding: 0 0 0 1rem; */
 }
 
 h2 {
@@ -171,5 +177,6 @@ h2 {
 
 main {
   padding: 1rem 0;
+  min-height: 90vh;
 }
 </style>

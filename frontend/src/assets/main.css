@@ -5,6 +5,7 @@
   margin: 0 auto;
   font-weight: normal;
   padding: 0 0.5rem;
+  height: 100vh;
 }
 
 a {
@@ -13,19 +14,44 @@ a {
 }
 
 button {
-  padding: 0.5rem 1rem;
+  padding: 0.2rem 1rem;
   /* border-radius: 1rem; */
-  background-color: var(--color-background);
-  color: var(--color-highlight);
-  border: 1px solid var(--color-highlight);
+  /* background-color: var(--color-highlight);
+  color: var(--color-dark);
+  border: 1px solid var(--color-dark); */
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
 }
-button:hover {
+/* button:hover {
+  background-color: var(--color-dark);
+  color: var(--color-highlight);
+  border: 1px solid var(--color-highlight);
+} */
+
+.btn-primary {
   background-color: var(--color-highlight);
-  color: var(--color-background);
+  color: var(--color-dark);
+  border: 1px solid var(--color-highlight);
 }
+
+.btn-primary:hover {
+  background-color: var(--color-dark);
+  color: var(--color-highlight);
+}
+
+.btn-secondary {
+  background-color: var(--color-dark);
+  color: var(--color-highlight);
+  border-color: var(--color-highlight);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-highlight);
+  color: var(--color-dark);
+  border: 1px solid var(--color-dark);
+}
+
 
 .button-row {
   display: flex;

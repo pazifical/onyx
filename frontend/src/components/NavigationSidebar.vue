@@ -13,7 +13,7 @@ const props = defineProps<{
       <h2>Directories</h2>
       <ul>
         <li v-for="directory in props.directoryContent.directories" :key="directory">
-          <RouterLink :to="`${props.currentDirectory}${directory}`">{{ directory }}</RouterLink>
+          <RouterLink class="btn-secondary" style="border: none;" :to="`${props.currentDirectory}${directory}`">{{ directory }}</RouterLink>
         </li>
       </ul>
     </section>
@@ -22,7 +22,7 @@ const props = defineProps<{
       <h2>Files</h2>
       <ul>
         <li v-for="filename in props.directoryContent.files" :key="filename">
-          <button @click="$emit('file-select', `${props.currentDirectory}/${filename}`)">
+          <button class="btn-secondary" @click="$emit('file-select', `${props.currentDirectory}/${filename}`)">
             {{ filename }}
           </button>
         </li>

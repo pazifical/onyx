@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/pazifical/onyx/internal/onyx"
 	"github.com/pazifical/onyx/logging"
 )
 
-var markdownDirectory = "testdata"
+var defaultMarkdownDirectory = "markdown"
+var defaultPort = 80
 
 //go:embed frontend/dist
 var frontendFS embed.FS
@@ -19,15 +21,23 @@ var frontendFS embed.FS
 var isDevMode bool
 
 func init() {
-	envMarkdownDirectory := os.Getenv("ONYX_MARKDOWN_DIRECTORY")
-	if envMarkdownDirectory != "" {
-		markdownDirectory = envMarkdownDirectory
+	envPortString := os.Getenv("ONYX_PORT")
+	if envPortString != "" {
+		envPort, err := strconv.Atoi(envPortString)
+		if err == nil {
+			defaultPort = envPort
+		}
 	}
 
-	fi, err := os.Stat(markdownDirectory)
+	envMarkdownDirectory := os.Getenv("ONYX_MARKDOWN_DIRECTORY")
+	if envMarkdownDirectory != "" {
+		defaultMarkdownDirectory = envMarkdownDirectory
+	}
+
+	fi, err := os.Stat(defaultMarkdownDirectory)
 	if errors.Is(err, os.ErrNotExist) {
-		logging.Info(fmt.Sprintf("markdown directory does not exists: %s", markdownDirectory))
-		err = os.MkdirAll(markdownDirectory, 0755)
+		logging.Info(fmt.Sprintf("markdown directory does not exists: %s", defaultMarkdownDirectory))
+		err = os.MkdirAll(defaultMarkdownDirectory, 0755)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -36,14 +46,14 @@ func init() {
 	}
 
 	if !fi.IsDir() {
-		log.Fatalf("given markdown directory is not a directory: %s", markdownDirectory)
+		log.Fatalf("given markdown directory is not a directory: %s", defaultMarkdownDirectory)
 	}
 }
 
 func main() {
 	config := onyx.Config{
-		Port:              80,
-		MarkdownDirectory: markdownDirectory,
+		Port:              defaultPort,
+		MarkdownDirectory: defaultMarkdownDirectory,
 	}
 
 	server := onyx.NewServer(config, frontendFS)

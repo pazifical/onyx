@@ -24,6 +24,23 @@ func (nr *NoteRepository) FetchAll() ([]types.Note, error) {
 	return importAllMarkdownFiles(nr.markdownDirectory)
 }
 
+func (nr *NoteRepository) Update(note types.Note) (types.Note, error) {
+	filePath := filepath.Join(nr.markdownDirectory, note.Path)
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		return note, err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(note.Text)
+	if err != nil {
+		return note, err
+	}
+
+	return note, nil
+}
+
 func (nr *NoteRepository) FetchOne(filePath string) (types.Note, error) {
 	data, err := os.ReadFile(filepath.Join(nr.markdownDirectory, filePath))
 	if err != nil {

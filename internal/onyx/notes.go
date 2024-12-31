@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/pazifical/onyx/internal/filesystem"
+	"github.com/pazifical/onyx/internal/types"
 	"github.com/pazifical/onyx/logging"
 )
 
@@ -44,6 +45,31 @@ func (s *Server) GetNoteByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) SaveNote(w http.ResponseWriter, r *http.Request) {
+	var note types.Note
+
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&note)
+	if err != nil {
+		logging.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	note, err = s.noteRepository.Update(note)
+	if err != nil {
+		logging.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(note)
+	if err != nil {
+		logging.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
 func (s *Server) GetNoteByFilePath(w http.ResponseWriter, r *http.Request) {
 	filePath := r.PathValue("path")
 	filePath = strings.ReplaceAll(filePath, "%20", " ")

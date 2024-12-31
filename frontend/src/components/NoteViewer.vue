@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { NoteRepository } from '@/repository/note'
 import type { Note } from '@/types'
-import { onMounted, ref, watch, type Ref } from 'vue'
+import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue'
 import * as showdown from 'showdown'
 
 const props = defineProps<{
@@ -19,6 +19,14 @@ const note: Ref<Note | null> = ref(null)
 const noteTextMd: Ref<string> = ref('')
 
 const isEditMode: Ref<boolean> = ref(false)
+
+const fileName: ComputedRef<string> = computed(() => {
+  if (!props.path) {
+    return ""
+  }
+  const parts = props.path.split("/");
+  return parts[parts.length - 1]
+})
 
 watch(
   () => props.path,
@@ -59,28 +67,30 @@ function updateMarkdown() {
 }
 
 async function saveNote() {
-  // TODO
+  if (!note.value) {
+    return
+  }
+  await noteRepository.saveNote(note.value)
+  noteTextMd.value = converter.makeHtml(note.value?.text)
+  toggleEditMode()
 }
 </script>
 
 <template>
+
+  <header>
+      <template v-if="isEditMode">
+          <button class="btn-primary" @click="saveNote()">Save</button>
+          <button class="btn-primary" @click="fetchData()">Cancel</button>
+      </template>
+      <template v-else>
+        <button class="btn-primary" @click="toggleEditMode()">Edit</button>
+      </template>
+  </header>
   <main v-if="note">
-
-    <header>
-      <h2 class="title" style="margin-left: 0; margin-right: auto;">/{{ note?.path }}</h2>
-      <div>
-        <template v-if="isEditMode">
-          <div class="button-row">
-            <button @click="saveNote()">Save</button>
-            <button @click="fetchData()">Cancel</button>
-          </div>
-        </template>
-        <template v-else>
-          <button @click="toggleEditMode()">Edit</button>
-        </template>
-      </div>
-    </header>
-
+    <div>
+      <h2 class="title" style="margin-left: 0; margin-right: auto;">{{ fileName }}</h2>
+    </div>
     <div class="markdown">
       <template v-if="isEditMode">
         <textarea v-model="note.text"></textarea>
@@ -94,14 +104,17 @@ async function saveNote() {
 
 <style scoped>
 /* header {
-  display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
 } */
+
 header {
-  height: 2rem;
   display: flex;
-  justify-content: right;
+  align-content: stretch;
+}
+
+header > * {
+  flex-grow: 1;
 }
 
 textarea {
@@ -117,6 +130,6 @@ textarea {
 }
 
 main {
-  padding: 1rem 0;
+  padding: 1rem;
 }
 </style>
