@@ -4,7 +4,7 @@ Something something
 
 ## Links to other files
 
-A link to [Something Deep.md](<BASEURL>/Top%20Level%201/Deep/Something%20Deep.md)
+A link to [Something Deep.md](/Top%20Level%201/Deep/Something%20Deep.md)
 
 ## Code
 
@@ -32,9 +32,9 @@ Or something along those lines.
 ### So how about one
 
 - First item
-  - Second level
-  - Also second level
-    - Something on the third level
+    - Second level
+    - Also second level
+        - Something on the third level
 - Second item
 - Third item
 

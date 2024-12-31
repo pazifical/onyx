@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { NoteRepository } from '@/repository/note'
 import type { Note } from '@/types'
-import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue'
+import {  onMounted, ref, watch, type Ref } from 'vue'
 import * as showdown from 'showdown'
-
-const props = defineProps<{
-  path?: string
-}>()
+import PencilFillIcon from './icons/PencilFillIcon.vue';
+import FloppyFillIcon from './icons/FloppyFillIcon.vue';
+import SquareXIcon from './icons/SquareXIcon.vue';
+import { useRoute } from 'vue-router';
 
 const converter = new showdown.Converter({
   tasklists: true,
@@ -20,38 +20,43 @@ const noteTextMd: Ref<string> = ref('')
 
 const isEditMode: Ref<boolean> = ref(false)
 
-const fileName: ComputedRef<string> = computed(() => {
-  if (!props.path) {
-    return ""
-  }
-  const parts = props.path.split("/");
-  return parts[parts.length - 1]
-})
+const route = useRoute()
+
+const fileName: Ref<string> = ref("")
+
 
 watch(
-  () => props.path,
-  async (newPath, oldPath) => {
-    console.log('note', oldPath, '->', newPath)
+  () => route.query.file,
+  async (newFilename, oldFilename) => {
+    if (newFilename === oldFilename) {
+      return
+    }
 
-    if (newPath) {
-      await fetchData()
+    console.log('note', oldFilename, '->', newFilename)
+
+    if (newFilename) {
+      await fetchData(`${route.path}/${newFilename}`)
     } else {
       note.value = null
     }
+
   },
 )
 
 onMounted(async () => {
-  await fetchData()
+  await fetchData(`${route.path}/${route.query.file}`)
 })
 
-async function fetchData() {
-  if (!props.path) {
+async function fetchData(filepath?: string) {
+  if (!filepath) {
     return
   }
 
+  const parts = filepath.split("/")
+  fileName.value = parts[parts.length-1]
+
   isEditMode.value = false
-  note.value = await noteRepository.getByPath(props.path)
+  note.value = await noteRepository.getByPath(filepath)
   updateMarkdown()
 }
 
@@ -74,18 +79,31 @@ async function saveNote() {
   noteTextMd.value = converter.makeHtml(note.value?.text)
   toggleEditMode()
 }
+
+async function cancelEdit() {
+  await fetchData(`${route.path}/${route.query.file}`)
+}
 </script>
 
 <template>
 
   <header>
-      <template v-if="isEditMode">
-          <button class="btn-primary" @click="saveNote()">Save</button>
-          <button class="btn-primary" @click="fetchData()">Cancel</button>
-      </template>
-      <template v-else>
-        <button class="btn-primary" @click="toggleEditMode()">Edit</button>
-      </template>
+    <template v-if="isEditMode">
+      <button class="btn-primary" @click="saveNote()">
+        <FloppyFillIcon />
+        <strong>Save</strong>
+      </button>
+      <button class="btn-primary" @click="cancelEdit()">
+        <SquareXIcon />
+        <strong>Cancel</strong>
+      </button>
+    </template>
+    <template v-else>
+      <button class="btn-primary" @click="toggleEditMode()">
+        <PencilFillIcon />
+        <strong>Edit</strong>
+      </button>
+    </template>
   </header>
   <main v-if="note">
     <div>
@@ -108,12 +126,21 @@ async function saveNote() {
   margin-bottom: 1rem;
 } */
 
+button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
 header {
   display: flex;
   align-content: stretch;
+  position: sticky;
+  top: 0;
 }
 
-header > * {
+header>* {
   flex-grow: 1;
 }
 
@@ -127,6 +154,7 @@ textarea {
 .title {
   color: var(--color-light);
   font-weight: bold;
+  border-bottom: 1px solid var(--color-light);
 }
 
 main {

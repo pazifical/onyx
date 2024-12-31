@@ -4,9 +4,10 @@ import NoteViewer from '@/components/NoteViewer.vue'
 import { DirectoryContentRepository } from '@/repository/directory'
 import type { DirectoryContent } from '@/types'
 import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 
 const currentDirectory: Ref<string> = ref('/')
 
@@ -37,11 +38,17 @@ const parentDirectories: ComputedRef<Array<Array<string>>> = computed(() => {
 watch(
   () => route.params.path,
   async (newPath, oldPath) => {
-    console.log(oldPath, '->', newPath)
+    if (newPath.toString() === oldPath.toString()) {
+      return
+    }
+
+    console.log("oldPath", oldPath, '->', "newPath", newPath)
     selectedFilePath.value = ''
     updateFromRoutePath(newPath)
   },
 )
+
+
 
 async function updateFromRoutePath(path: Array<string> | string) {
   if (path && typeof path != 'string') {
@@ -53,6 +60,13 @@ async function updateFromRoutePath(path: Array<string> | string) {
   console.log('currentDirectory', currentDirectory.value)
 
   directoryContent.value = await directoryContentRepository.getByPath(currentDirectory.value)
+}
+
+function changeFile(filePath: string) {
+  const parts = filePath.split("/")
+  router.replace({ query: { file: parts[parts.length-1] }})
+  selectedFilePath.value = filePath
+
 }
 
 onMounted(async () => {
@@ -88,20 +102,20 @@ function showSidebar() {
       <div id="sidebar">
         <div id="nav-area">
           <NavigationSidebar  class="sidebar-content" :directory-content="directoryContent"
-            :current-directory="currentDirectory" @file-select="(path) => (selectedFilePath = path)" />
+            :current-directory="currentDirectory" @file-select="(path) => changeFile(path)" />
 
             <template v-if="isSidebarVisible">
-              <div class="shrinker" @click="hideSidebar()">-</div>
+              <button class="shrinker" @click="hideSidebar()">◀</button>
             </template>
             <template v-else>
-              <div class="shrinker" @click="showSidebar()">+</div>
+              <button class="shrinker" @click="showSidebar()">▶</button>
             </template>
 
         </div>
       </div>
 
       <div id="note-viewer" v-if="selectedFilePath">
-        <NoteViewer :path="selectedFilePath" />
+        <NoteViewer />
       </div>
       <div v-else style="display: flex; justify-content: center;; padding: 1rem">
         <strong style="font-size: 1.5rem; color: rgb(255 255 255 / 0.5)">Please select a file on the left </strong>
@@ -115,8 +129,9 @@ function showSidebar() {
 .shrinker {
   background-color: var(--color-highlight);
   font-weight: bold;
-  color: var(--color-dark);
+  color: var(--color-light);
   text-align: center;
+  padding: 0rem;
 }
 
 .shrinker:hover {
@@ -162,10 +177,6 @@ nav {
   padding: 0 1rem 0 0;
 }
 
-#note-viewer {
-  /* padding: 0 0 0 1rem; */
-}
-
 h2 {
   color: var(--color-text);
 }
@@ -176,7 +187,7 @@ h2 {
 }
 
 main {
-  padding: 1rem 0;
+  /* padding: 1rem 0 0 0; */
   min-height: 90vh;
 }
 </style>

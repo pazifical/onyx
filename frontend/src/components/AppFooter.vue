@@ -7,12 +7,11 @@
 
 <style scoped>
 * {
-  background-color: var(--color-highlight);
-  color: var(--color-dark);
+  color: var(--color-highlight);
 }
 main {
+  border-top: 2px solid var(--color-light);
   padding: 0.5rem 1rem;
-
   text-align: right;
 }
 </style>

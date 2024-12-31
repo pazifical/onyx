@@ -13,7 +13,9 @@ const props = defineProps<{
       <h2>Directories</h2>
       <ul>
         <li v-for="directory in props.directoryContent.directories" :key="directory">
-          <RouterLink class="btn-secondary" style="border: none;" :to="`${props.currentDirectory}${directory}`">{{ directory }}</RouterLink>
+          <RouterLink class="btn-secondary" style="border: none;" :to="`${props.currentDirectory}${directory}`">
+            <p class="bullet">⧐</p> {{ directory }}
+          </RouterLink>
         </li>
       </ul>
     </section>
@@ -23,7 +25,7 @@ const props = defineProps<{
       <ul>
         <li v-for="filename in props.directoryContent.files" :key="filename">
           <button class="btn-secondary" @click="$emit('file-select', `${props.currentDirectory}/${filename}`)">
-            {{ filename }}
+            <p class="bullet">⧐</p> {{ filename }}
           </button>
         </li>
       </ul>
@@ -32,6 +34,10 @@ const props = defineProps<{
 </template>
 
 <style scoped>
+.bullet {
+  color: var(--color-light);
+  display: inline-block;
+}
 nav {
   font-size: 1rem;
 }
