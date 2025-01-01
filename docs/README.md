@@ -22,7 +22,7 @@ Like many open source projects, **Onyx** is born out of the intrinsic motivation
 
 ## How to get started
 
-In the [Getting started](1.%20Getting%20started/1.1%20Server%20setup.md) 
-[asdf](1.%20Getting%20started/1.2%20Deployment.md) blabal
+- [Server setup](1.%20Getting%20started/1.1%20Server%20setup.html) 
+- [Deployment](1.%20Getting%20started/1.2%20Deployment.html)
 
 
