@@ -4,6 +4,10 @@
 
 There is no need for a database, because everything is stored in **markdown** files within a **directory tree** of your choosing.
 
+## Github
+
+You can view the source code on [Github](https://github.com/pazifical/onyx).
+
 ## Yet another note taking solution?
 
 Yes, another one. Why? Several reasons:
