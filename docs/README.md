@@ -20,6 +20,9 @@ For my use case, Obsidian has some shortcoming that cannot be overcome: you cann
 
 Like many open source projects, **Onyx** is born out of the intrinsic motivation to solve a problem at hand. 
 
+## How to get started
 
+In the [Getting started](1.%20Getting%20started/1.1%20Server%20setup.md) 
+[asdf](1.%20Getting%20started/1.2%20Deployment.md) blabal
 
 
