@@ -32,4 +32,4 @@ Like many open source projects, **Onyx** is born out of the intrinsic motivation
 
 **Advanced topics**
 - [Reminding yourself via text messages](2.%20Advanced%20topics/2.1%20Reminders.html)
-- [Representing your notes in a networks](2.%20Advanced%20topics/2.2%20Note%20Network.html)
+- [Representing your notes in a network](2.%20Advanced%20topics/2.2%20Note%20Network.html)
