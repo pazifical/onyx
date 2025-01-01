@@ -24,12 +24,12 @@ For my use case, Obsidian has some shortcoming that cannot be overcome: you cann
 
 Like many open source projects, **Onyx** is born out of the intrinsic motivation to solve a problem at hand. 
 
-## How to get started
+## Getting started
 
-**Getting started**
+**Basics**
 - [Setting up your server](1.%20Getting%20started/1.1%20Server%20setup.html) 
 - [Deploying Onyx to your server](1.%20Getting%20started/1.2%20Deployment.html)
 
-**Advanted topics**
+**Advanced topics**
 - [Reminding you via text messages](2.%20Advanced%20topics/2.1%20Reminders.html)
 - [Representing your notes in a networks](2.%20Advanced%20topics/2.2%20Note%20Network.html)
