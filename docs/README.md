@@ -31,5 +31,5 @@ Like many open source projects, **Onyx** is born out of the intrinsic motivation
 - [Deploying Onyx to your server](1.%20Getting%20started/1.2%20Deployment.html)
 
 **Advanced topics**
-- [Reminding you via text messages](2.%20Advanced%20topics/2.1%20Reminders.html)
+- [Reminding yourself via text messages](2.%20Advanced%20topics/2.1%20Reminders.html)
 - [Representing your notes in a networks](2.%20Advanced%20topics/2.2%20Note%20Network.html)
