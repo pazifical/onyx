@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"errors"
 	"os"
 	"strings"
 )
@@ -30,4 +31,14 @@ func NewDirectoryContent(directory string) (DirectoryContent, error) {
 	}
 
 	return directoryContent, nil
+}
+
+func CreateDirectory(directoryPath string) error {
+	err := os.MkdirAll(directoryPath, 0755)
+	if errors.Is(err, os.ErrExist) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+	return nil
 }

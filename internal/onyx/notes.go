@@ -70,6 +70,7 @@ func (s *Server) SaveNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
 func (s *Server) GetNoteByFilePath(w http.ResponseWriter, r *http.Request) {
 	filePath := r.PathValue("path")
 	filePath = strings.ReplaceAll(filePath, "%20", " ")
@@ -87,6 +88,21 @@ func (s *Server) GetNoteByFilePath(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *Server) CreateDirectory(w http.ResponseWriter, r *http.Request) {
+	directoryPath := r.PathValue("path")
+	directoryPath = strings.ReplaceAll(directoryPath, "%20", " ")
+	directoryPath = filepath.Join(s.config.MarkdownDirectory, directoryPath)
+
+	err := filesystem.CreateDirectory(directoryPath)
+	if err != nil {
+		logging.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (s *Server) GetDirectoryContent(w http.ResponseWriter, r *http.Request) {
