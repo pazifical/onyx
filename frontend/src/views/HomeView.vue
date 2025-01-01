@@ -120,7 +120,7 @@ function showSidebar() {
     <div class="content" :style="{ 'grid-template-columns': selectedGridLayout }">
       <div id="sidebar">
         <div id="nav-area">
-          <NavigationSidebar  class="sidebar-content" :directory-content="directoryContent"
+          <NavigationSidebar @refresh="updateFromRoutePath(route.params.path)"  class="sidebar-content" :directory-content="directoryContent"
             :current-directory="currentDirectory" @file-select="(path) => changeFile(path)" />
 
             <template v-if="isSidebarVisible">

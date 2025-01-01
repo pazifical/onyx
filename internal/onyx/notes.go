@@ -102,7 +102,7 @@ func (s *Server) CreateDirectory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	s.GetDirectoryContent(w, r)
 }
 
 func (s *Server) GetDirectoryContent(w http.ResponseWriter, r *http.Request) {
