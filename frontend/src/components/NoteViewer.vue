@@ -49,6 +49,9 @@ watch(
 )
 
 onMounted(async () => {
+  if (!route.query.file) {
+    return
+  }
   const url = `${route.path}/${route.query.file}`;
   console.log("fetching from", url)
   await fetchData(url)

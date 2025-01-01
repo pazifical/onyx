@@ -38,6 +38,7 @@ func NewServer(config Config, frontendFS embed.FS) *Server {
 	server.mux.HandleFunc("GET /api/notes/{path...}", server.GetNoteByFilePath)
 	server.mux.HandleFunc("PUT /api/notes/{path...}", server.SaveNote)
 	server.mux.HandleFunc("GET /api/directory/{path...}", server.GetDirectoryContent)
+	server.mux.HandleFunc("GET /api/reminders", server.GetAllReminders)
 
 	return &server
 }

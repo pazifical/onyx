@@ -38,7 +38,7 @@ const parentDirectories: ComputedRef<Array<Array<string>>> = computed(() => {
 watch(
   () => route.params.path,
   async (newPath, oldPath) => {
-    if (newPath.toString() === oldPath.toString()) {
+    if (oldPath && newPath && newPath.toString() === oldPath.toString()) {
       return
     }
 
@@ -69,6 +69,7 @@ watch(
 
 
 async function updateFromRoutePath(path: Array<string> | string) {
+  console.log(path)
   if (path && typeof path != 'string') {
     currentDirectory.value = '/' + path.join('/') + '/'
   } else {

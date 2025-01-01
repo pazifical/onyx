@@ -6,10 +6,18 @@ import { RouterLink } from 'vue-router'
   <header>
     <div class="wrapper">
       <nav>
-        <RouterLink to="/">
-          <h1>O<strong style="font-size: 2rem;">NYX</strong></h1>
-        </RouterLink>
-        <strong>Markdown Manager</strong>
+        <div>
+          <RouterLink to="/">
+            <h1>O<strong style="font-size: 2rem;">NYX</strong></h1>
+          </RouterLink>
+          <strong>Markdown Manager</strong>
+        </div>
+        <div>
+          <div id="links">
+            <RouterLink to="/">Home</RouterLink>
+            <RouterLink to="/onyx/reminders">Reminders</RouterLink>
+          </div>
+        </div>
       </nav>
     </div>
   </header>
@@ -28,4 +36,16 @@ a {
   line-height: initial;
 }
 
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+
+#links {
+  display: flex;
+  gap: 2rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
 </style>

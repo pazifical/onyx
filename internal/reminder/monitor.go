@@ -34,6 +34,10 @@ func NewMonitoringService(repository *database.NoteRepository) MonitoringService
 	}
 }
 
+func (ms *MonitoringService) GetAllReminders() []Reminder {
+	return ms.reminders
+}
+
 func (ms *MonitoringService) Start() {
 	logging.Info("staring Onyx reminder monitoring service")
 	for {

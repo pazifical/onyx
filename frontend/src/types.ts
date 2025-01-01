@@ -7,3 +7,9 @@ export interface DirectoryContent {
   files: Array<string>
   directories: Array<string>
 }
+
+export interface Reminder {
+  date: string
+  todo: string
+  source: string
+}
