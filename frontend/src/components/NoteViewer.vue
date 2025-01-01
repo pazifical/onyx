@@ -167,4 +167,9 @@ textarea {
 main {
   padding: 1rem;
 }
+
+.markdown {
+  font-size: 1.2rem;
+}
+
 </style>
