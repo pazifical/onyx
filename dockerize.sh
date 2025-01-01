@@ -1,3 +1,4 @@
 source "onyx.env"
 
-docker build -t "onyx:$ONYX_VERSION" .
+docker build -t "pazifical/onyx:$ONYX_VERSION" .
+docker push "pazifical/onyx:$ONYX_VERSION"
