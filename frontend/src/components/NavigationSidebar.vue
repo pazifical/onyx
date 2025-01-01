@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 
-const emit = defineEmits(["refresh"])
+const emit = defineEmits(["refresh", "file-select"])
 
 const directoryRepository = new DirectoryContentRepository()
 const noteRepository = new NoteRepository()
