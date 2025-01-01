@@ -22,7 +22,10 @@ Like many open source projects, **Onyx** is born out of the intrinsic motivation
 
 ## How to get started
 
-- [Server setup](1.%20Getting%20started/1.1%20Server%20setup.html) 
-- [Deployment](1.%20Getting%20started/1.2%20Deployment.html)
+**Getting started**
+- [Setting up your server](1.%20Getting%20started/1.1%20Server%20setup.html) 
+- [Deploying Onyx](1.%20Getting%20started/1.2%20Deployment.html)
 
-
+**Advanted topics**
+- [Using reminders](2.%20Advanced%20topics/2.1%20Reminders.html)
+- [Note Networks](2.%20Advanced%20topics/2.2%20Note%20Network.html)
