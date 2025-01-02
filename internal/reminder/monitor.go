@@ -1,12 +1,14 @@
 package reminder
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/pazifical/onyx/internal/database"
+	"github.com/pazifical/onyx/internal/matrix"
 	"github.com/pazifical/onyx/internal/types"
 	"github.com/pazifical/onyx/logging"
 )
@@ -24,14 +26,19 @@ func init() {
 }
 
 type MonitoringService struct {
-	repository *database.NoteRepository
-	reminders  []Reminder
+	repository    *database.NoteRepository
+	reminders     []Reminder
+	matrixService *matrix.Service
 }
 
 func NewMonitoringService(repository *database.NoteRepository) MonitoringService {
 	return MonitoringService{
 		repository: repository,
 	}
+}
+
+func (ms *MonitoringService) InitializeMatrixService(matrixService *matrix.Service) {
+	ms.matrixService = matrixService
 }
 
 func (ms *MonitoringService) GetAllReminders() []Reminder {
@@ -62,6 +69,37 @@ func (ms *MonitoringService) searchForReminders() error {
 		if len(reminders) > 0 {
 			ms.reminders = append(ms.reminders, reminders...)
 		}
+	}
+
+	if ms.matrixService != nil {
+		err = ms.matrixService.Authenticate()
+		if err != nil {
+			logging.Error(err.Error())
+		}
+
+		err = ms.sendMatrixMessages(ms.reminders)
+		if err != nil {
+			logging.Error(err.Error())
+		}
+	}
+
+	return nil
+}
+
+func (ms *MonitoringService) sendMatrixMessages(reminders []Reminder) error {
+	err := ms.matrixService.Authenticate()
+	if err != nil {
+		return err
+	}
+
+	var builder strings.Builder
+	for _, reminder := range reminders {
+		builder.WriteString(fmt.Sprintf("%s\n%s\n(%s)\n\n\n", reminder.Date, reminder.ToDo, reminder.Source))
+	}
+
+	err = ms.matrixService.SendMessage(builder.String())
+	if err != nil {
+		return err
 	}
 
 	return nil

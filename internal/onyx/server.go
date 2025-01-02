@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pazifical/onyx/internal/database"
+	"github.com/pazifical/onyx/internal/matrix"
 	"github.com/pazifical/onyx/internal/reminder"
 	"github.com/pazifical/onyx/logging"
 )
@@ -43,6 +44,10 @@ func NewServer(config Config, frontendFS embed.FS) *Server {
 	server.mux.HandleFunc("GET /api/reminders", server.GetAllReminders)
 
 	return &server
+}
+
+func (s *Server) AddMatrixService(matrixService *matrix.Service) {
+	s.monitoringService.InitializeMatrixService(matrixService)
 }
 
 func (s *Server) Start() error {

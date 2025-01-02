@@ -8,12 +8,17 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/pazifical/onyx/internal/matrix"
 	"github.com/pazifical/onyx/internal/onyx"
 	"github.com/pazifical/onyx/logging"
 )
 
 var defaultMarkdownDirectory = "markdown"
 var defaultPort = 80
+
+var matrixRoomID string
+var matrixUsername string
+var matrixPassword string
 
 //go:embed frontend/dist
 var frontendFS embed.FS
@@ -48,6 +53,31 @@ func init() {
 	if !fi.IsDir() {
 		log.Fatalf("given markdown directory is not a directory: %s", defaultMarkdownDirectory)
 	}
+
+	initMatrixConfigFromEnv()
+}
+
+func initMatrixConfigFromEnv() {
+	roomID := os.Getenv("ONYX_MATRIX_ROOM_ID")
+	if roomID == "" {
+		logging.Info("Please provide a Matrix room id via env ONYX_MATRIX_ROOM_ID")
+		return
+	}
+	matrixRoomID = roomID
+
+	username := os.Getenv("ONYX_MATRIX_USERNAME")
+	if username == "" {
+		logging.Info("Please provide a Matrix username via env ONYX_MATRIX_USERNAME")
+		return
+	}
+	matrixUsername = username
+
+	password := os.Getenv("ONYX_MATRIX_PASSWORD")
+	if password == "" {
+		logging.Info("Please provide a Matrix user password id via env ONYX_MATRIX_PASSWORD")
+		return
+	}
+	matrixPassword = password
 }
 
 func main() {
@@ -57,6 +87,15 @@ func main() {
 	}
 
 	server := onyx.NewServer(config, frontendFS)
+
+	if matrixPassword != "" && matrixUsername != "" && matrixRoomID != "" {
+		matrixService := matrix.NewService(matrix.Credentials{
+			Username: matrixUsername,
+			Password: matrixPassword,
+		}, matrixRoomID)
+		server.AddMatrixService(&matrixService)
+	}
+
 	err := server.Start()
 	if err != nil {
 		log.Fatal(err)
