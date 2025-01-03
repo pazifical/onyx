@@ -34,7 +34,7 @@ function cancelDirectoryCreation() {
 }
 
 async function submitDirectoryCreation() {
-  const directoryPath = `${props.currentDirectory}${newDirectoryName.value}`
+  const directoryPath = `${props.currentDirectory}/${newDirectoryName.value}`
   console.log("new dir", directoryPath)
   await directoryRepository.createNew(directoryPath)
   newDirectoryName.value = ""
@@ -43,7 +43,7 @@ async function submitDirectoryCreation() {
 }
 
 async function submitFileCreation() {
-  const notePath = `${props.currentDirectory}${newNoteName.value}`
+  const notePath = `${props.currentDirectory}/${newNoteName.value}`
   console.log("new note", notePath)
   await noteRepository.saveNote({
     path: notePath,
@@ -62,11 +62,11 @@ function cancelFileCreation() {
 
 <template>
   <main v-if="props.directoryContent">
-    <section v-if="props.directoryContent.directories.length > 0">
+    <section>
       <h2>Directories</h2>
       <ul>
         <li v-for="directory in props.directoryContent.directories" :key="directory">
-          <RouterLink class="btn-secondary" style="border: none;" :to="`${props.currentDirectory}${directory}`">
+          <RouterLink class="btn-secondary" style="border: none;" :to="`${props.currentDirectory}/${directory}`">
             <p class="bullet">⧐</p> {{ directory }}
           </RouterLink>
         </li>
@@ -88,15 +88,18 @@ function cancelFileCreation() {
       </ul>
     </section>
 
-    <section v-if="props.directoryContent.files.length > 0">
+    <section>
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2>Files</h2>
       </div>
       <ul>
         <li v-for="filename in props.directoryContent.files" :key="filename">
-          <button class="btn-secondary" @click="$emit('file-select', `${props.currentDirectory}/${filename}`)">
+          <!-- <button class="btn-secondary" @click="$emit('file-select', `${props.currentDirectory}/${filename}`)">
             <p class="bullet">⧐</p> {{ filename }}
-          </button>
+          </button> -->
+          <RouterLink class="btn-secondary" style="border: none;" :to="`${props.currentDirectory}/${filename}`">
+            <p class="bullet">⧐</p> {{ filename }}
+          </RouterLink>
         </li>
         <li>
           <template v-if="isNoteCreation">

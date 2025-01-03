@@ -2,16 +2,19 @@
 import NavigationSidebar from '@/components/NavigationSidebar.vue'
 import NoteViewer from '@/components/NoteViewer.vue'
 import { DirectoryContentRepository } from '@/repository/directory'
-import type { DirectoryContent } from '@/types'
+import { NoteRepository } from '@/repository/note'
+import type { DirectoryContent, Note } from '@/types'
 import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 
 const currentDirectory: Ref<string> = ref('/')
 
 const directoryContentRepository = new DirectoryContentRepository()
+const noteRepository = new NoteRepository()
+
+const selectedNote: Ref<Note | null> = ref(null)
 
 const directoryContent: Ref<DirectoryContent | null> = ref(null)
 
@@ -38,42 +41,31 @@ const parentDirectories: ComputedRef<Array<Array<string>>> = computed(() => {
 watch(
   () => route.params.path,
   async (newPath, oldPath) => {
-    if (oldPath && newPath && newPath.toString() === oldPath.toString()) {
-      return
-    }
-
     console.log("oldPath", oldPath, '->', "newPath", newPath)
-    selectedFilePath.value = ''
-    updateFromRoutePath(newPath)
+    updateFromRoutePath()
   },
 )
 
-
-// watch(
-//   () => route.query.file,
-//   async (newFilename, oldFilename) => {
-//     if (newFilename === oldFilename) {
-//       return
-//     }
-
-//     console.log('note', oldFilename, '->', newFilename)
-
-//     if (newFilename) {
-//       selectedFilePath.value = `${route.path}/${newFilename}`
-//     } else {
-//       selectedFilePath.value = null
-//     }
-
-//   },
-// )
-
-
-async function updateFromRoutePath(path: Array<string> | string) {
-  console.log(path)
+async function updateFromRoutePath() {
+  const path = route.params.path
   if (path && typeof path != 'string') {
-    currentDirectory.value = '/' + path.join('/') + '/'
+    const parts = [...path];
+    if (parts[parts.length - 1].endsWith(".md")) {
+      currentDirectory.value = "/" + parts.slice(0, parts.length - 1).join("/")
+      selectedFilePath.value = parts[parts.length - 1]
+
+      selectedNote.value = await noteRepository.getByPath(path.join("/"))
+      console.log("updating note with note", selectedNote.value)
+
+      if (parts.length == 1) {
+        currentDirectory.value = ""
+      }
+
+    } else {
+      currentDirectory.value = "/" + path.join('/')
+    }
   } else {
-    currentDirectory.value = '/'
+    currentDirectory.value = ''
   }
 
   console.log('currentDirectory', currentDirectory.value)
@@ -81,16 +73,9 @@ async function updateFromRoutePath(path: Array<string> | string) {
   directoryContent.value = await directoryContentRepository.getByPath(currentDirectory.value)
 }
 
-function changeFile(filePath: string) {
-  const parts = filePath.split("/")
-  router.replace({ query: { file: parts[parts.length-1] }})
-  selectedFilePath.value = filePath
-
-}
 
 onMounted(async () => {
-  updateFromRoutePath(route.params.path)
-  return
+  updateFromRoutePath()
 })
 
 function hideSidebar() {
@@ -120,21 +105,21 @@ function showSidebar() {
     <div class="content" :style="{ 'grid-template-columns': selectedGridLayout }">
       <div id="sidebar">
         <div id="nav-area">
-          <NavigationSidebar @refresh="updateFromRoutePath(route.params.path)"  class="sidebar-content" :directory-content="directoryContent"
-            :current-directory="currentDirectory" @file-select="(path) => changeFile(path)" />
+          <NavigationSidebar class="sidebar-content" :directory-content="directoryContent"
+            :current-directory="currentDirectory" />
 
-            <template v-if="isSidebarVisible">
-              <button class="shrinker" @click="hideSidebar()">◀</button>
-            </template>
-            <template v-else>
-              <button class="shrinker" @click="showSidebar()">▶</button>
-            </template>
+          <template v-if="isSidebarVisible">
+            <button class="shrinker" @click="hideSidebar()">◀</button>
+          </template>
+          <template v-else>
+            <button class="shrinker" @click="showSidebar()">▶</button>
+          </template>
 
         </div>
       </div>
 
       <div id="note-viewer" v-if="selectedFilePath">
-        <NoteViewer/>
+        <NoteViewer :note="selectedNote" :key="selectedNote?.path" />
       </div>
       <div v-else style="display: flex; justify-content: center;; padding: 1rem">
         <strong style="font-size: 1.5rem; color: rgb(255 255 255 / 0.5)">Please select a file on the left </strong>
@@ -144,7 +129,6 @@ function showSidebar() {
 </template>
 
 <style scoped>
-
 .shrinker {
   background-color: var(--color-highlight);
   font-weight: bold;

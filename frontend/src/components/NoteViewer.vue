@@ -8,7 +8,7 @@ import FloppyFillIcon from './icons/FloppyFillIcon.vue';
 import SquareXIcon from './icons/SquareXIcon.vue';
 import { useRoute } from 'vue-router';
 
-// const props = defineProps<{ path?: string }>()
+const props = defineProps<{ note: Note | null }>()
 
 const converter = new showdown.Converter({
   tasklists: true,
@@ -16,7 +16,7 @@ const converter = new showdown.Converter({
 
 const noteRepository = new NoteRepository()
 
-const note: Ref<Note | null> = ref(null)
+const noteCopy: Ref<Note | null> = ref(null)
 
 const noteTextMd: Ref<string> = ref('')
 
@@ -26,9 +26,7 @@ const route = useRoute()
 
 const fileName: Ref<string> = ref("")
 
-// watch(() => props.path, async (oldPath, newPath) => {
-//   console.log("from", oldPath, "to", newPath)
-// })
+
 
 watch(
   () => route.query.file,
@@ -42,19 +40,24 @@ watch(
     if (newFilename) {
       await fetchData(`${route.path}/${newFilename}`)
     } else {
-      note.value = null
+      noteCopy.value = null
     }
 
   },
 )
 
 onMounted(async () => {
-  if (!route.query.file) {
+  if (!props.note) {
     return
   }
-  const url = `${route.path}/${route.query.file}`;
-  console.log("fetching from", url)
-  await fetchData(url)
+
+  noteCopy.value = JSON.parse(JSON.stringify(props.note))
+
+  console.log(noteCopy.value)
+  updateMarkdown()
+
+  const parts = props.note.path.split("/")
+  fileName.value = parts[parts.length-1]
 })
 
 async function fetchData(filepath?: string) {
@@ -66,7 +69,7 @@ async function fetchData(filepath?: string) {
   fileName.value = parts[parts.length - 1]
 
   isEditMode.value = false
-  note.value = await noteRepository.getByPath(filepath)
+  noteCopy.value = await noteRepository.getByPath(filepath)
   updateMarkdown()
 }
 
@@ -75,18 +78,18 @@ function toggleEditMode() {
 }
 
 function updateMarkdown() {
-  if (!note.value) {
+  if (!noteCopy.value) {
     return
   }
-  noteTextMd.value = converter.makeHtml(note.value?.text)
+  noteTextMd.value = converter.makeHtml(noteCopy.value?.text)
 }
 
 async function saveNote() {
-  if (!note.value) {
+  if (!noteCopy.value) {
     return
   }
-  await noteRepository.saveNote(note.value)
-  noteTextMd.value = converter.makeHtml(note.value?.text)
+  await noteRepository.saveNote(noteCopy.value)
+  noteTextMd.value = converter.makeHtml(noteCopy.value?.text)
   toggleEditMode()
 }
 
@@ -115,13 +118,13 @@ async function cancelEdit() {
       </button>
     </template>
   </header>
-  <main v-if="note">
+  <main v-if="noteCopy">
     <div>
       <h2 class="title" style="margin-left: 0; margin-right: auto;">{{ fileName }}</h2>
     </div>
     <div class="markdown">
       <template v-if="isEditMode">
-        <textarea v-model="note.text"></textarea>
+        <textarea v-model="noteCopy.text"></textarea>
       </template>
       <template v-else>
         <div v-html="noteTextMd"></div>
@@ -131,11 +134,6 @@ async function cancelEdit() {
 </template>
 
 <style scoped>
-/* header {
-  justify-content: space-between;
-  margin-bottom: 1rem;
-} */
-
 button {
   display: flex;
   align-items: center;
