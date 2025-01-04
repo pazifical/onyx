@@ -6,20 +6,20 @@ import { RouterLink } from 'vue-router'
   <header>
     <div class="wrapper">
       <nav>
-        <div style="display: flex; align-items: end; gap:0.5rem">
-          <div>
-            <img alt="Onyx logo" class="logo" src="../assets/logo.svg" style="height:3em" />
+        <RouterLink to="/" style="border-bottom: 2px solid var(--color-highlight)">
+          <div style="display: flex; align-items: center; gap:0.5rem">
+            <div>
+              <img alt="Onyx logo" class="logo" src="../assets/logo.svg" style="height:3em" />
+            </div>
+            <div>
+              <h1>ONYX</h1>
+            </div>
           </div>
-          <div>
-            <RouterLink to="/">
-              <h1>O<strong style="font-size: 2rem;">NYX</strong></h1>
-            </RouterLink>
-          </div>
-        </div>
+        </RouterLink>
         <div>
           <div id="links">
-            <RouterLink to="/">Home</RouterLink>
-            <RouterLink to="/onyx/reminders">Reminders</RouterLink>
+            <RouterLink class="link" to="/">Home</RouterLink>
+            <RouterLink class="link" to="/onyx/reminders">Reminders</RouterLink>
           </div>
         </div>
       </nav>
@@ -28,15 +28,12 @@ import { RouterLink } from 'vue-router'
 </template>
 
 <style scoped>
-.logo {
-}
 
 h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: bold;
   margin: 0px;
-  text-shadow: 2px 2px 0 var(--color-light);
-  letter-spacing: 0.4rem;
+  color: var(--color-light);
 }
 
 a {
@@ -54,5 +51,12 @@ nav {
   gap: 2rem;
   font-weight: bold;
   font-size: 1.2rem;
+}
+
+.link {
+  border: 2px solid var(--color-dark);
+}
+.link:hover {
+  border-bottom: 2px solid var(--color-light);
 }
 </style>
