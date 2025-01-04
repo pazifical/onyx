@@ -62,8 +62,10 @@ async function updateFromRoutePath() {
         selectedNote.value = await noteRepository.getByPath(path.join("/"))
       } catch (e) {
         console.log(`${e}`)
-        errorMessage.value = e.message
-        errorDialog.value?.showModal()
+        if (e instanceof Error) {
+          errorMessage.value = e.message
+          errorDialog.value?.showModal()
+        }
         return
       }
       console.log("updating note with note", selectedNote.value)
@@ -85,12 +87,18 @@ async function updateFromRoutePath() {
     directoryContent.value = await directoryContentRepository.getByPath(currentDirectory.value)
   } catch (e) {
     console.log(`${e}`)
-    errorMessage.value = e.message
-    errorDialog.value?.showModal()
+    if (e instanceof Error) {
+      errorMessage.value = e.message
+      errorDialog.value?.showModal()
+    }
     return
   }
 }
 
+function closeErrorDialog() {
+  errorMessage.value = ""
+  errorDialog.value?.close()
+}
 
 onMounted(async () => {
   updateFromRoutePath()
@@ -148,7 +156,7 @@ function showSidebar() {
   <dialog ref="errorDialog" id="error-dialog">
     <header>
       <h1>Error</h1>
-      <button @click="errorDialog?.close()" class="btn-primary">
+      <button @click="closeErrorDialog()" class="btn-primary">
         <SquareXIcon />
       </button>
     </header>
