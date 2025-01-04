@@ -1,3 +1,5 @@
+![Onyx logo](docs/logo.png)
+
 # Onyx - What is it?
 
 **Onyx** is a self hosted note taking web application. Deploy it on a server of your choice and take notes wherever you are on whatever device you have at hand. 
