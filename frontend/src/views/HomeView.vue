@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SquareXIcon from '@/components/icons/SquareXIcon.vue'
 import NavigationSidebar from '@/components/NavigationSidebar.vue'
 import NoteViewer from '@/components/NoteViewer.vue'
 import { DirectoryContentRepository } from '@/repository/directory'
@@ -10,6 +11,9 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const currentDirectory: Ref<string> = ref('/')
+
+const errorDialog: Ref<HTMLDialogElement | null> = ref(null)
+const errorMessage: Ref<string> = ref("")
 
 const directoryContentRepository = new DirectoryContentRepository()
 const noteRepository = new NoteRepository()
@@ -54,7 +58,14 @@ async function updateFromRoutePath() {
       currentDirectory.value = "/" + parts.slice(0, parts.length - 1).join("/")
       selectedFilePath.value = parts[parts.length - 1]
 
-      selectedNote.value = await noteRepository.getByPath(path.join("/"))
+      try {
+        selectedNote.value = await noteRepository.getByPath(path.join("/"))
+      } catch (e) {
+        console.log(`${e}`)
+        errorMessage.value = e.message
+        errorDialog.value?.showModal()
+        return
+      }
       console.log("updating note with note", selectedNote.value)
 
       if (parts.length == 1) {
@@ -70,7 +81,14 @@ async function updateFromRoutePath() {
 
   console.log('currentDirectory', currentDirectory.value)
 
-  directoryContent.value = await directoryContentRepository.getByPath(currentDirectory.value)
+  try {
+    directoryContent.value = await directoryContentRepository.getByPath(currentDirectory.value)
+  } catch (e) {
+    console.log(`${e}`)
+    errorMessage.value = e.message
+    errorDialog.value?.showModal()
+    return
+  }
 }
 
 
@@ -126,9 +144,50 @@ function showSidebar() {
       </div>
     </div>
   </main>
+
+  <dialog ref="errorDialog" id="error-dialog">
+    <header>
+      <h1>Error</h1>
+      <button @click="errorDialog?.close()" class="btn-primary">
+        <SquareXIcon />
+      </button>
+    </header>
+    <br>
+    <p>
+      {{ errorMessage }}
+    </p>
+  </dialog>
 </template>
 
 <style scoped>
+#error-dialog {
+  background-color: var(--color-dark);
+  border: 4px solid var(--color-highlight);
+  margin: auto;
+}
+
+#error-dialog::backdrop {
+  background-color: rgb(0 0 0 /0.5);
+  backdrop-filter: blur(4px);
+}
+
+
+#error-dialog>p {
+  color: var(--color-light);
+  font-size: 1.2rem;
+}
+
+#error-dialog>header {
+  display: flex;
+  justify-content: space-between;
+}
+
+#error-dialog>header>button {
+  border: none;
+  background-color: var(--color-dark);
+  color: var(--color-highlight);
+}
+
 .shrinker {
   background-color: var(--color-highlight);
   font-weight: bold;
@@ -148,13 +207,13 @@ function showSidebar() {
   grid-template-columns: 1fr 1rem;
 }
 
-header {
+main header {
   height: 2rem;
   display: flex;
   justify-content: right;
 }
 
-header>button {
+main header>button {
   padding: none;
   border: 1px solid var(--color-highlight);
   border-radius: 0;

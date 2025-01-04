@@ -69,7 +69,13 @@ async function fetchData(filepath?: string) {
   fileName.value = parts[parts.length - 1]
 
   isEditMode.value = false
-  noteCopy.value = await noteRepository.getByPath(filepath)
+  try {
+    noteCopy.value = await noteRepository.getByPath(filepath)
+  } catch(e) {
+    console.log(`${e}`)
+    return
+  }
+
   updateMarkdown()
 }
 
@@ -88,7 +94,14 @@ async function saveNote() {
   if (!noteCopy.value) {
     return
   }
-  await noteRepository.saveNote(noteCopy.value)
+
+  try {
+    await noteRepository.saveNote(noteCopy.value)
+  } catch(e) {
+    console.log(`${e}`)
+    return
+  }
+
   noteTextMd.value = converter.makeHtml(noteCopy.value?.text)
   toggleEditMode()
 }

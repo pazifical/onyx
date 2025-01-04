@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/pazifical/onyx/internal"
 	"github.com/pazifical/onyx/logging"
 )
 
@@ -12,7 +13,9 @@ func (s *Server) GetAllReminders(w http.ResponseWriter, r *http.Request) {
 	err := json.NewEncoder(w).Encode(reminders)
 	if err != nil {
 		logging.Error(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		s.respondWithError(w, http.StatusInternalServerError, internal.OnyxError{
+			ErrorMessage: "unable to encode reminders to JSON",
+		})
 		return
 	}
 }

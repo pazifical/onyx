@@ -2,9 +2,11 @@ package onyx
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/pazifical/onyx/internal"
 	"github.com/pazifical/onyx/internal/database"
 	"github.com/pazifical/onyx/internal/matrix"
 	"github.com/pazifical/onyx/internal/reminder"
@@ -61,4 +63,14 @@ func (s *Server) Start() error {
 	}
 
 	return nil
+}
+
+func (s *Server) respondWithError(w http.ResponseWriter, httpStatusCode int, onyxError internal.OnyxError) {
+	w.WriteHeader(httpStatusCode)
+
+	err := json.NewEncoder(w).Encode(onyxError)
+	if err != nil {
+		logging.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

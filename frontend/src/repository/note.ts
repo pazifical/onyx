@@ -3,13 +3,25 @@ import type { Note } from '@/types'
 export class NoteRepository {
   async getAll(): Promise<Array<Note>> {
     const response = await fetch('/api/notes')
-    return response.json()
+
+    const data = await response.json()
+    if (response.status > 400) {
+      throw new Error(data.error_message)
+    }
+
+    return data
   }
 
   async getByPath(path: string): Promise<Note> {
     const url = `/api/notes/${path}`
     const response = await fetch(url)
-    return response.json()
+
+    const data = await response.json()
+    if (response.status > 400) {
+      throw new Error(data.error_message)
+    }
+
+    return data
   }
 
   async saveNote(note: Note): Promise<Note> {
@@ -21,6 +33,12 @@ export class NoteRepository {
       },
       body: JSON.stringify(note),
     })
-    return response.json()
+
+    const data = await response.json()
+    if (response.status > 400) {
+      throw new Error(data.error_message)
+    }
+
+    return data
   }
 }

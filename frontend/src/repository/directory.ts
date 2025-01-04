@@ -5,7 +5,13 @@ export class DirectoryContentRepository {
     const url = `/api/directory${path}`
     console.log("get", url)
     const response = await fetch(url)
-    return response.json()
+
+    const data = await response.json()
+    if (response.status > 400) {
+      throw new Error(data.error_message)
+    }
+
+    return data
   }
 
   async createNew(path: string): Promise<DirectoryContent> {
@@ -13,6 +19,12 @@ export class DirectoryContentRepository {
     const response = await fetch(url,{
       method: "POST",
     })
-    return response.json()
+
+    const data = await response.json()
+    if (response.status > 400) {
+      throw new Error(data.error_message)
+    }
+
+    return data
   }
 }

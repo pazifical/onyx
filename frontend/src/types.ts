@@ -13,3 +13,7 @@ export interface Reminder {
   todo: string
   source: string
 }
+
+export interface OnyxError {
+	error_message: string
+}
