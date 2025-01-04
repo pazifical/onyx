@@ -71,6 +71,10 @@ func (ms *MonitoringService) searchForReminders() error {
 		}
 	}
 
+	if len(ms.reminders) == 0 {
+		return nil
+	}
+
 	if ms.matrixService != nil {
 		err = ms.matrixService.Authenticate()
 		if err != nil {

@@ -6,11 +6,15 @@ import { RouterLink } from 'vue-router'
   <header>
     <div class="wrapper">
       <nav>
-        <div>
-          <RouterLink to="/">
-            <h1>O<strong style="font-size: 2rem;">NYX</strong></h1>
-          </RouterLink>
-          <strong>Markdown Manager</strong>
+        <div style="display: flex; align-items: end; gap:0.5rem">
+          <div>
+            <img alt="Onyx logo" class="logo" src="../assets/logo.svg" style="height:3em" />
+          </div>
+          <div>
+            <RouterLink to="/">
+              <h1>O<strong style="font-size: 2rem;">NYX</strong></h1>
+            </RouterLink>
+          </div>
         </div>
         <div>
           <div id="links">
@@ -24,6 +28,9 @@ import { RouterLink } from 'vue-router'
 </template>
 
 <style scoped>
+.logo {
+}
+
 h1 {
   font-size: 3rem;
   font-weight: bold;
