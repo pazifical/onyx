@@ -132,7 +132,8 @@ function showSidebar() {
       <div id="sidebar">
         <div id="nav-area">
           <NavigationSidebar class="sidebar-content" :directory-content="directoryContent"
-            :current-directory="currentDirectory" />
+            :current-directory="currentDirectory"
+            @refresh="updateFromRoutePath()"/>
 
           <template v-if="isSidebarVisible">
             <button class="shrinker" @click="hideSidebar()">◀</button>

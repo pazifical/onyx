@@ -5,6 +5,25 @@ import (
 	"time"
 )
 
+func TestExtractOnyxExpression1(t *testing.T) {
+	line := "- [ ] Learn something [[until:2024-12-24]]"
+
+	expr, ok := extractOnyxExpression(line)
+	if !ok {
+		t.Error("could not extract onyx expression")
+	}
+
+	wantType := "until"
+	if expr.Type != wantType {
+		t.Errorf("%s != %s", expr.Type, wantType)
+	}
+
+	wantContent := "2024-12-24"
+	if expr.Content != wantContent {
+		t.Errorf("%s != %s", expr.Content, wantContent)
+	}
+}
+
 func TestExtractReminder1(t *testing.T) {
 	line := "- [ ] Learn something (#until:2024-12-24)"
 
@@ -16,8 +35,8 @@ func TestExtractReminder1(t *testing.T) {
 	}
 
 	wantToDo := "Learn something"
-	if reminder.ToDo != wantToDo {
-		t.Errorf("%s != %s", reminder.ToDo, wantToDo)
+	if reminder.Content != wantToDo {
+		t.Errorf("%s != %s", reminder.Content, wantToDo)
 	}
 
 	wantDate := time.Date(2024, time.December, 24, 0, 0, 0, 0, time.UTC)
@@ -42,8 +61,8 @@ func TestExtractReminder2(t *testing.T) {
 
 	// TODO: Should this really be the behaviour?
 	wantToDo := "Learn something  and something else"
-	if reminder.ToDo != wantToDo {
-		t.Errorf("%s != %s", reminder.ToDo, wantToDo)
+	if reminder.Content != wantToDo {
+		t.Errorf("%s != %s", reminder.Content, wantToDo)
 	}
 
 	wantDate := time.Date(2024, time.December, 24, 0, 0, 0, 0, time.UTC)

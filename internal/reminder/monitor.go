@@ -14,15 +14,15 @@ import (
 )
 
 var interval = time.Hour
-var untilRegex *regexp.Regexp
+var onyxDirectiveRegex *regexp.Regexp
 
 func init() {
-	r, err := regexp.Compile(`\(#until:\d\d\d\d-\d{1,2}-\d{1,2}\)`)
+	r, err := regexp.Compile(`\[\[.*:.*\]\]`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	untilRegex = r
+	onyxDirectiveRegex = r
 }
 
 type MonitoringService struct {
@@ -98,7 +98,7 @@ func (ms *MonitoringService) sendMatrixMessages(reminders []Reminder) error {
 
 	var builder strings.Builder
 	for _, reminder := range reminders {
-		builder.WriteString(fmt.Sprintf("%s\n%s\n(%s)\n\n\n", reminder.Date, reminder.ToDo, reminder.Source))
+		builder.WriteString(fmt.Sprintf("%s\n%s\n(%s)\n\n\n", reminder.Date, reminder.Content, reminder.Source))
 	}
 
 	err = ms.matrixService.SendMessage(builder.String())
@@ -118,8 +118,30 @@ func extractRemindersFromNote(note types.Note) []Reminder {
 			continue
 		}
 		reminders = append(reminders, reminder)
+
+		logging.Info(fmt.Sprintf("found reminder (%s): %s", reminder.Type, reminder.Content))
 	}
 	return reminders
+}
+
+func extractOnyxExpression(text string) (OnyxExpression, bool) {
+	match := onyxDirectiveRegex.FindString(text)
+	if match == "" {
+		return OnyxExpression{}, false
+	}
+
+	stripped := strings.Replace(match, "[[", "", 1)
+	stripped = strings.Replace(stripped, "]]", "", 1)
+
+	parts := strings.SplitN(stripped, ":", 2)
+	if len(parts) != 2 {
+		return OnyxExpression{}, false
+	}
+
+	return OnyxExpression{
+		Type:    parts[0],
+		Content: parts[1],
+	}, true
 }
 
 func extractReminderFromLine(line string, source string) (Reminder, bool) {
@@ -130,29 +152,67 @@ func extractReminderFromLine(line string, source string) (Reminder, bool) {
 
 	stripped := strings.Replace(line, prefix, "", 1)
 
-	match := untilRegex.FindString(line)
-	if match == "" {
+	onyxExpr, ok := extractOnyxExpression(stripped)
+	if !ok {
 		return Reminder{}, false
 	}
 
-	todo := strings.Replace(stripped, match, "", 1)
+	if onyxExpr.Type == deadlineType {
+		date, err := time.Parse("2006-01-02", onyxExpr.Content)
+		if err != nil {
+			logging.Error(err.Error())
+			return Reminder{}, false
+		}
 
-	dateString := strings.Replace(match, "(#until:", "", 1)
-	dateString = strings.Replace(dateString, ")", "", 1)
+		if time.Now().Before(date) {
+			return Reminder{}, false
+		}
 
-	date, err := time.Parse("2006-01-02", dateString)
-	if err != nil {
-		logging.Error(err.Error())
-		return Reminder{}, false
+		return Reminder{
+			Date:    date,
+			Content: strings.TrimSpace(stripped),
+			Type:    onyxExpr.Type,
+			Source:  source,
+		}, true
+	} else if onyxExpr.Type == birthdayType {
+		date, err := time.Parse("2006-01-02", onyxExpr.Content)
+		if err != nil {
+			logging.Error(err.Error())
+			return Reminder{}, false
+		}
+
+		now := time.Now()
+		if now.Day() != date.Day() || now.Month() != date.Month() {
+			return Reminder{}, false
+		}
+
+		return Reminder{
+			Date:    date,
+			Content: strings.TrimSpace(stripped),
+			Type:    onyxExpr.Type,
+			Source:  source,
+		}, true
+	} else if onyxExpr.Type == dateType {
+		date, err := time.Parse("2006-01-02", onyxExpr.Content)
+		if err != nil {
+			logging.Error(err.Error())
+			return Reminder{}, false
+		}
+
+		now := time.Now()
+		if now.Day() != date.Day() || now.Month() != date.Month() || now.Year() != date.Year() {
+			return Reminder{}, false
+		}
+
+		return Reminder{
+			Date:    date,
+			Content: strings.TrimSpace(stripped),
+			Type:    onyxExpr.Type,
+			Source:  source,
+		}, true
+	} else {
+		logging.Warning(fmt.Sprintf("onyx expression '%s' not implemented yet", onyxExpr.Type))
 	}
 
-	if time.Now().Before(date) {
-		return Reminder{}, false
-	}
-
-	return Reminder{
-		Date:   date,
-		ToDo:   strings.TrimSpace(todo),
-		Source: source,
-	}, true
+	return Reminder{}, false
 }
