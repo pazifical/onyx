@@ -8,6 +8,7 @@ import (
 
 	"github.com/pazifical/onyx/internal"
 	"github.com/pazifical/onyx/internal/database"
+	"github.com/pazifical/onyx/internal/filesystem"
 	"github.com/pazifical/onyx/internal/matrix"
 	"github.com/pazifical/onyx/internal/reminder"
 	"github.com/pazifical/onyx/logging"
@@ -44,6 +45,7 @@ func NewServer(config Config, frontendFS embed.FS) *Server {
 	server.mux.HandleFunc("GET /api/directory/{path...}", server.GetDirectoryContent)
 	server.mux.HandleFunc("POST /api/directory/{path...}", server.CreateDirectory)
 	server.mux.HandleFunc("GET /api/reminders", server.GetAllReminders)
+	server.mux.HandleFunc("GET /api/directory_tree", server.GetDirectoryTree)
 
 	return &server
 }
@@ -72,5 +74,19 @@ func (s *Server) respondWithError(w http.ResponseWriter, httpStatusCode int, ony
 	if err != nil {
 		logging.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) GetDirectoryTree(w http.ResponseWriter, r *http.Request) {
+	dirTree, err := filesystem.CreateDirectoryTree(s.config.MarkdownDirectory)
+	if err != nil {
+		s.respondWithError(w, http.StatusInternalServerError, internal.OnyxError{ErrorMessage: "unable to create a directory tree"})
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(dirTree)
+	if err != nil {
+		s.respondWithError(w, http.StatusInternalServerError, internal.OnyxError{ErrorMessage: "unable to encode directory tree to JSON"})
+		return
 	}
 }

@@ -6,6 +6,55 @@ import (
 	"strings"
 )
 
+type Directory struct {
+	Path        string      `json:"path"`
+	Directories []Directory `json:"directories"`
+	Filenames   []string    `json:"filenames"`
+}
+
+func CreateDirectoryTree(root string) (Directory, error) {
+	rootDirectory := Directory{
+		Path:        root,
+		Directories: make([]Directory, 0),
+		Filenames:   make([]string, 0),
+	}
+
+	err := traverseDirectory(root, &rootDirectory)
+	if err != nil {
+		return Directory{}, err
+	}
+
+	return rootDirectory, nil
+}
+
+func traverseDirectory(path string, dir *Directory) error {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			subDir := Directory{
+				Path:        path + "/" + entry.Name(),
+				Directories: make([]Directory, 0),
+				Filenames:   make([]string, 0),
+			}
+
+			err := traverseDirectory(subDir.Path, &subDir)
+			if err != nil {
+				return err
+			}
+
+			dir.Directories = append(dir.Directories, subDir)
+		} else {
+			dir.Filenames = append(dir.Filenames, entry.Name())
+		}
+	}
+
+	return nil
+}
+
 type DirectoryContent struct {
 	Directories []string `json:"directories"`
 	Files       []string `json:"files"`
