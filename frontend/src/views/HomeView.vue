@@ -52,6 +52,9 @@ watch(
 
 async function updateFromRoutePath() {
   const path = route.params.path
+  selectedNote.value = null
+  selectedFilePath.value = ""
+
   if (path && typeof path != 'string') {
     const parts = [...path];
     if (parts[parts.length - 1].endsWith(".md")) {
@@ -148,7 +151,7 @@ function showSidebar() {
       <div id="note-viewer" v-if="selectedFilePath">
         <NoteViewer :note="selectedNote" :key="selectedNote?.path" />
       </div>
-      <div v-else style="display: flex; justify-content: center;; padding: 1rem">
+      <div v-else style="display: flex; justify-content: center; padding: 1rem">
         <strong style="font-size: 1.5rem; color: rgb(255 255 255 / 0.5)">Please select a file on the left </strong>
       </div>
     </div>
