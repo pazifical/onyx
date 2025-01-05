@@ -210,6 +210,23 @@ func extractReminderFromLine(line string, source string) (Reminder, bool) {
 			Type:    onyxExpr.Type,
 			Source:  source,
 		}, true
+	} else if onyxExpr.Type == untilType {
+		date, err := time.Parse("2006-01-02", onyxExpr.Content)
+		if err != nil {
+			logging.Error(err.Error())
+			return Reminder{}, false
+		}
+
+		if time.Now().After(date) {
+			return Reminder{}, false
+		}
+
+		return Reminder{
+			Date:    date,
+			Content: strings.TrimSpace(stripped),
+			Type:    onyxExpr.Type,
+			Source:  source,
+		}, true
 	} else {
 		logging.Warning(fmt.Sprintf("onyx expression '%s' not implemented yet", onyxExpr.Type))
 	}

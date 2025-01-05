@@ -14,3 +14,8 @@ Using a list with checkboxes, a keyword and a date, reminders can be enabled:
 ## Specific dates
 
 - [ ] Some important appointment [[date:2025-01-05]]
+
+## Until a date
+
+- [ ] Do something in the garden [[until:2024-12-12]]
+- [ ] Do something in the garden [[until:2025-12-12]]

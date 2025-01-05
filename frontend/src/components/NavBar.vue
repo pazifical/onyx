@@ -20,6 +20,7 @@ import { RouterLink } from 'vue-router'
           <div id="links">
             <RouterLink class="link" to="/">Home</RouterLink>
             <RouterLink class="link" to="/onyx/reminders">Reminders</RouterLink>
+            <RouterLink class="link" to="/onyx/info">Info</RouterLink>
           </div>
         </div>
       </nav>

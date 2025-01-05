@@ -33,5 +33,6 @@ onMounted(async() => {
 
 main {
   padding: 1rem 0;
+  min-height: 90vh;
 }
 </style>

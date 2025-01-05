@@ -5,6 +5,7 @@ import "time"
 const birthdayType = "birthday"
 const deadlineType = "deadline"
 const dateType = "date"
+const untilType = "until"
 
 type Reminder struct {
 	Date    time.Time `json:"date"`

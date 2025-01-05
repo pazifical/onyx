@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ReminderView from '@/views/ReminderView.vue'
+import InfoView from '@/views/InfoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +20,11 @@ const router = createRouter({
       path: '/onyx/reminders',
       name: 'reminders',
       component: ReminderView,
+    },
+    {
+      path: '/onyx/info',
+      name: 'info',
+      component: InfoView,
     },
   ],
 })
