@@ -25,31 +25,36 @@ func init() {
 	onyxDirectiveRegex = r
 }
 
-type MonitoringService struct {
+type ReminderService struct {
 	repository    *database.NoteRepository
-	reminders     []Reminder
+	reminders     []types.Reminder
 	matrixService *matrix.Service
 }
 
-func NewMonitoringService(repository *database.NoteRepository) MonitoringService {
-	return MonitoringService{
+func NewReminderService(repository *database.NoteRepository) ReminderService {
+	return ReminderService{
 		repository: repository,
 	}
 }
 
-func (ms *MonitoringService) InitializeMatrixService(matrixService *matrix.Service) {
+func (ms *ReminderService) InitializeMatrixService(matrixService *matrix.Service) {
 	ms.matrixService = matrixService
 }
 
-func (ms *MonitoringService) GetAllReminders() []Reminder {
+func (ms *ReminderService) GetAllReminders() []types.Reminder {
 	return ms.reminders
 }
 
-func (ms *MonitoringService) Start() {
-	logging.Info("staring Onyx reminder monitoring service")
+func (ms *ReminderService) AddReminder() error {
+	// TODO: implement
+	return nil
+}
+
+func (ms *ReminderService) StartMonitoring() {
+	logging.Info("starting Onyx reminder monitoring service")
 	for {
 		logging.Info("searching markdown files for reminders")
-		ms.reminders = make([]Reminder, 0)
+		ms.reminders = make([]types.Reminder, 0)
 		err := ms.searchForReminders()
 		if err != nil {
 			logging.Error(err.Error())
@@ -58,7 +63,7 @@ func (ms *MonitoringService) Start() {
 	}
 }
 
-func (ms *MonitoringService) searchForReminders() error {
+func (ms *ReminderService) searchForReminders() error {
 	notes, err := ms.repository.FetchAll()
 	if err != nil {
 		return err
@@ -90,7 +95,7 @@ func (ms *MonitoringService) searchForReminders() error {
 	return nil
 }
 
-func (ms *MonitoringService) sendMatrixMessages(reminders []Reminder) error {
+func (ms *ReminderService) sendMatrixMessages(reminders []types.Reminder) error {
 	err := ms.matrixService.Authenticate()
 	if err != nil {
 		return err
@@ -109,8 +114,8 @@ func (ms *MonitoringService) sendMatrixMessages(reminders []Reminder) error {
 	return nil
 }
 
-func extractRemindersFromNote(note types.Note) []Reminder {
-	reminders := make([]Reminder, 0)
+func extractRemindersFromNote(note types.Note) []types.Reminder {
+	reminders := make([]types.Reminder, 0)
 
 	for _, line := range strings.Split(note.Text, "\n") {
 		reminder, ok := extractReminderFromLine(line, note.Path)
@@ -144,31 +149,31 @@ func extractOnyxExpression(text string) (OnyxExpression, bool) {
 	}, true
 }
 
-func extractReminderFromLine(line string, source string) (Reminder, bool) {
+func extractReminderFromLine(line string, source string) (types.Reminder, bool) {
 	prefix := "- [ ] "
 	if !strings.HasPrefix(line, prefix) {
-		return Reminder{}, false
+		return types.Reminder{}, false
 	}
 
 	stripped := strings.Replace(line, prefix, "", 1)
 
 	onyxExpr, ok := extractOnyxExpression(stripped)
 	if !ok {
-		return Reminder{}, false
+		return types.Reminder{}, false
 	}
 
 	if onyxExpr.Type == deadlineType {
 		date, err := time.Parse("2006-01-02", onyxExpr.Content)
 		if err != nil {
 			logging.Error(err.Error())
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
 		if time.Now().Before(date) {
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
-		return Reminder{
+		return types.Reminder{
 			Date:    date,
 			Content: strings.TrimSpace(stripped),
 			Type:    onyxExpr.Type,
@@ -178,15 +183,15 @@ func extractReminderFromLine(line string, source string) (Reminder, bool) {
 		date, err := time.Parse("2006-01-02", onyxExpr.Content)
 		if err != nil {
 			logging.Error(err.Error())
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
 		now := time.Now()
 		if now.Day() != date.Day() || now.Month() != date.Month() {
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
-		return Reminder{
+		return types.Reminder{
 			Date:    date,
 			Content: strings.TrimSpace(stripped),
 			Type:    onyxExpr.Type,
@@ -196,15 +201,15 @@ func extractReminderFromLine(line string, source string) (Reminder, bool) {
 		date, err := time.Parse("2006-01-02", onyxExpr.Content)
 		if err != nil {
 			logging.Error(err.Error())
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
 		now := time.Now()
 		if now.Day() != date.Day() || now.Month() != date.Month() || now.Year() != date.Year() {
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
-		return Reminder{
+		return types.Reminder{
 			Date:    date,
 			Content: strings.TrimSpace(stripped),
 			Type:    onyxExpr.Type,
@@ -214,14 +219,14 @@ func extractReminderFromLine(line string, source string) (Reminder, bool) {
 		date, err := time.Parse("2006-01-02", onyxExpr.Content)
 		if err != nil {
 			logging.Error(err.Error())
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
 		if time.Now().After(date) {
-			return Reminder{}, false
+			return types.Reminder{}, false
 		}
 
-		return Reminder{
+		return types.Reminder{
 			Date:    date,
 			Content: strings.TrimSpace(stripped),
 			Type:    onyxExpr.Type,
@@ -231,5 +236,5 @@ func extractReminderFromLine(line string, source string) (Reminder, bool) {
 		logging.Warning(fmt.Sprintf("onyx expression '%s' not implemented yet", onyxExpr.Type))
 	}
 
-	return Reminder{}, false
+	return types.Reminder{}, false
 }

@@ -15,24 +15,24 @@ import (
 )
 
 type Server struct {
-	config            Config
-	mux               *http.ServeMux
-	noteRepository    *database.NoteRepository
-	frontendFS        embed.FS
-	monitoringService *reminder.MonitoringService
+	config          Config
+	mux             *http.ServeMux
+	noteRepository  *database.NoteRepository
+	frontendFS      embed.FS
+	reminderService *reminder.ReminderService
 }
 
 func NewServer(config Config, frontendFS embed.FS) *Server {
 	noteRepo := database.NewNoteRepository(config.MarkdownDirectory)
 
-	monitoringService := reminder.NewMonitoringService(&noteRepo)
+	reminderService := reminder.NewReminderService(&noteRepo)
 
 	server := Server{
-		config:            config,
-		mux:               http.NewServeMux(),
-		noteRepository:    &noteRepo,
-		frontendFS:        frontendFS,
-		monitoringService: &monitoringService,
+		config:          config,
+		mux:             http.NewServeMux(),
+		noteRepository:  &noteRepo,
+		frontendFS:      frontendFS,
+		reminderService: &reminderService,
 	}
 
 	server.mux.HandleFunc("GET /", server.ServeIndex)
@@ -45,17 +45,18 @@ func NewServer(config Config, frontendFS embed.FS) *Server {
 	server.mux.HandleFunc("GET /api/directory/{path...}", server.GetDirectoryContent)
 	server.mux.HandleFunc("POST /api/directory/{path...}", server.CreateDirectory)
 	server.mux.HandleFunc("GET /api/reminders", server.GetAllReminders)
+	server.mux.HandleFunc("POST /api/reminders", server.AddReminder)
 	server.mux.HandleFunc("GET /api/directory_tree", server.GetDirectoryTree)
 
 	return &server
 }
 
 func (s *Server) AddMatrixService(matrixService *matrix.Service) {
-	s.monitoringService.InitializeMatrixService(matrixService)
+	s.reminderService.InitializeMatrixService(matrixService)
 }
 
 func (s *Server) Start() error {
-	go s.monitoringService.Start()
+	go s.reminderService.StartMonitoring()
 
 	logging.Info(fmt.Sprintf("starting Onyx server on port %d", s.config.Port))
 
